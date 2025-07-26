@@ -1,0 +1,36 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*",
+  "Jwt": {
+    "SecretKey": "YOUR_JWT_SECRET_KEY_HERE"
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "YOUR_DATABASE_CONNECTION_STRING_HERE"
+  },
+  "Paymob": {
+    "SecretKey": "YOUR_PAYMOB_SECRET_KEY_HERE",
+    "PublicKey": "YOUR_PAYMOB_PUBLIC_KEY_HERE"
+  },
+  "EmailSettings": {
+    "From": "your-email@domain.com",
+    "SmtpServer": "your-smtp-server.com",
+    "Port": "465",
+    "Username": "your-email@domain.com",
+    "Password": "YOUR_EMAIL_PASSWORD_HERE"
+  },
+  "AWS": {
+    "AccessKey": "YOUR_AWS_ACCESS_KEY_HERE",
+    "SecretKey": "YOUR_AWS_SECRET_KEY_HERE",
+    "Region": "your-aws-region",
+    "BucketName": "your-s3-bucket-name"
+  },
+  "DentalMesh": {
+    "ApiKey": "YOUR_DENTALMESH_API_KEY_HERE",
+    "BaseUrl": "https://api.dentalmesh.ai"
+  }
+} 

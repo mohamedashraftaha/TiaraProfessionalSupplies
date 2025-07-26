@@ -1,0 +1,215 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(30, 58, 138, 0.10), 0 1.5px 4px rgba(30, 58, 138, 0.08);
+            overflow: hidden;
+        }
+
+        .logo {
+            text-align: center;
+            margin-top: 32px;
+            margin-bottom: 12px;
+        }
+
+        .logo img {
+            width: 120px;
+            height: auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a, #4052B5);
+            color: white;
+            padding: 32px 24px 20px 24px;
+            text-align: center;
+        }
+
+        .header-title {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .content {
+            padding: 32px 24px 24px 24px;
+        }
+
+        .success-badge {
+            display: inline-block;
+            background: #059669;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .greeting {
+            font-size: 1.1rem;
+            color: #334155;
+            margin-bottom: 12px;
+        }
+
+        .order-confirmation {
+            font-size: 1rem;
+            color: #334155;
+            margin-bottom: 24px;
+        }
+
+        .order-id {
+            font-weight: bold;
+            color: #1e3a8a;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #1e293b;
+            margin-bottom: 12px;
+        }
+
+        .order-items {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .total-section {
+            background: linear-gradient(135deg, #1e3a8a, #4052B5);
+            color: white;
+            padding: 24px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 24px 0;
+        }
+
+        .total-label {
+            font-size: 1rem;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .total-amount {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .support-section {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 16px;
+        }
+
+        .support-text {
+            font-size: 1rem;
+            color: #334155;
+            margin-bottom: 10px;
+        }
+
+        .support-email {
+            display: inline-block;
+            background: #1e3a8a;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .support-email:hover {
+            background: #4052B5;
+        }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.95rem;
+            padding: 24px 0 16px 0;
+            background: #f1f5f9;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .footer-brand {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #1e3a8a;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 600px) {
+            .email-container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .content,
+            .header {
+                padding-left: 8px;
+                padding-right: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="email-container">
+        <div class="logo">
+            <img src="https://tiaraprofessionalsupplies.s3.eu-central-1.amazonaws.com/Tiara-logo-original.png" alt="TiaraPro Logo">
+        </div>
+        <div class="header">
+            <h1 class="header-title">Order Confirmed!</h1>
+        </div>
+        <div class="content">
+            <div class="success-badge">Order Successfully Placed</div>
+            <div class="greeting">Hello {{CustomerName}},</div>
+            <div class="order-confirmation">
+                Your order <span class="order-id">#{{OrderId}}</span> has been confirmed and is being processed.
+            </div>
+            <div class="section">
+                <div class="section-title">Order Summary</div>
+                <div class="order-items">
+                    {{OrderItems}}
+                </div>
+            </div>
+            <div class="total-section">
+                <div class="total-label">Total Amount</div>
+                <div class="total-amount">{{TotalAmount}}</div>
+            </div>
+            <div class="support-section">
+                <div class="support-text">Need help? We're here for you.</div>
+                <a href="mailto:support@tiarapro.com" class="support-email">Contact Support</a>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-brand">TiaraPro</div>
+            <div>info@tiarapro.com</div>
+        </div>
+    </div>
+</body>
+
+</html>

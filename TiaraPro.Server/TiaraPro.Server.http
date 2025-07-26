@@ -1,0 +1,6 @@
+@TiaraPro.Server_HostAddress = http://localhost:5047
+
+GET {{TiaraPro.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
