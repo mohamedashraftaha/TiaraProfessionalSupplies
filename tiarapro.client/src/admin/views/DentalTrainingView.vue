@@ -120,34 +120,28 @@
                     <table class="min-w-full w-[1200px] divide-y divide-slate-200">
                         <thead class="bg-slate-50">
                             <tr>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Title</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Date</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Location</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Instructors</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Capacity</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Packages</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Registrations</th>
-                                <th
-                                    class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                                    Actions</th>
+                                <th @click="setSort('title')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                                    Title <span v-if="sortColumn==='title'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                                </th>
+                                <th @click="setSort('date')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                                    Date <span v-if="sortColumn==='date'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                                </th>
+                                <th @click="setSort('location')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                                    Location <span v-if="sortColumn==='location'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                                </th>
+                                <th @click="setSort('instructors')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                                    Instructors <span v-if="sortColumn==='instructors'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                                </th>
+                                <th @click="setSort('capacity')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                                    Capacity <span v-if="sortColumn==='capacity'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Packages</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Registrations</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-slate-200">
-                            <tr v-for="training in trainings" :key="training.id" class="hover:bg-slate-50 transition">
+                            <tr v-for="training in sortedTrainings" :key="training.id" class="hover:bg-slate-50 transition">
                                 <td class="px-6 py-4 font-bold text-slate-800 text-base">{{ training.title }}</td>
                                 <td class="px-6 py-4 text-slate-700">{{ formatDate(training.date) }}</td>
                                 <td class="px-6 py-4 text-slate-700">{{ training.location || 'Not specified' }}</td>
@@ -578,6 +572,36 @@ const packageInputs = ref([
     { name: '', price: null },
     { name: '', price: null }
 ]);
+
+const sortColumn = ref('date')
+const sortDirection = ref('desc')
+
+const setSort = (column) => {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortColumn.value = column
+    sortDirection.value = 'asc'
+  }
+}
+
+const sortedTrainings = computed(() => {
+  const sorted = [...trainings.value]
+  sorted.sort((a, b) => {
+    let valA = a[sortColumn.value]
+    let valB = b[sortColumn.value]
+    if (valA === undefined || valA === null) valA = ''
+    if (valB === undefined || valB === null) valB = ''
+    if (sortColumn.value.toLowerCase().includes('date') || sortColumn.value.toLowerCase().includes('at')) {
+      valA = new Date(valA)
+      valB = new Date(valB)
+    }
+    if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1
+    if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1
+    return 0
+  })
+  return sorted
+})
 
 const handleImageUploadClick = () => {
     imageUploadInput.value?.click()

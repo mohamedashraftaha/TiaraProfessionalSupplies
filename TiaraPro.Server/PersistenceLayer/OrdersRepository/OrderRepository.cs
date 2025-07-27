@@ -14,17 +14,11 @@ namespace TiaraPro.Server.PersistenceLayer.OrdersRepository
             _logger = logger;
         }
 
-        public async Task<int> CreateOrderAsync(Order order)
+        public async Task CreateOrderAsync(Order order)
         {
             try
             {
                 await _context.Orders.AddAsync(order);
-                int rowsAffected = await _context.SaveChangesAsync();
-
-                _logger.LogInformation("Created order with ID: {OrderId}. Rows affected: {RowsAffected}",
-                    order.Id, rowsAffected);
-
-                return rowsAffected;
             }
             catch (Exception ex)
             {

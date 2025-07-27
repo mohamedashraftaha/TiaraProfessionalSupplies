@@ -32,17 +32,16 @@ public class OrderService : IOrderService
         {
             await _unitOfWork.BeginTransactionAsync();
 
-            int rowsAffected = await _unitOfWork.Orders.CreateOrderAsync(order);
+            await _unitOfWork.Orders.CreateOrderAsync(order);
 
-            if (rowsAffected > 0)
+            int rowsAffected = await _unitOfWork.CompleteAsync();
+
+            if (rowsAffected <= 0)
             {
-                await _unitOfWork.CompleteAsync();
-                return true;
+                var ex = new Exception("No rows affected when creating order.");
+                throw ex;
             }
-
-            await _unitOfWork.RollbackAsync();
-            _logger.LogWarning("No rows affected when creating order. Order ID: {OrderId}", order.Id);
-            return false;
+            return true;
         }
         catch (Exception ex)
         {
@@ -105,18 +104,8 @@ public class OrderService : IOrderService
                                 if (dentalTraining.Capacity > 0)
                                 {
                                     dentalTraining.Capacity--;
-                                    var updated = await _dentalTrainingService.UpdateTrainingAsync(dentalTraining);
-                                    if (!updated)
-                                    {
-                                        _logger.LogWarning("Failed to update capacity for dental training ID: {DentalTrainingId}", dentalTraining.Id);
-                                        return false;
-                                    }
-                                    var confirmRegistration = await _dentalTrainingService.ConfirmRegistrationAsync(orderId, orderDetails.UserId.GetValueOrDefault());
-                                    if (!confirmRegistration)
-                                    {
-                                        _logger.LogWarning("Failed to confirm registration for dental training ID: {DentalTrainingId}", dentalTraining.Id);
-                                        return false;
-                                    }
+                                    await _dentalTrainingService.UpdateTrainingAsync(dentalTraining);
+                                    await _dentalTrainingService.ConfirmRegistrationAsync(orderId, orderDetails.UserId.GetValueOrDefault());
                                 }
                                 else
                                 {
@@ -150,7 +139,12 @@ public class OrderService : IOrderService
 
             try
             {
-                await _unitOfWork.CompleteAsync();
+                int rowsAffected = await _unitOfWork.CompleteAsync();
+                if (rowsAffected <= 0 && !tiaraAI)
+                {
+                    _logger.LogWarning("No rows affected when confirming order with ID: {OrderId} and status: {Status}", orderId, status);
+                    return false;
+                }
             }
             catch (Exception ex)
             {
@@ -251,20 +245,16 @@ public class OrderService : IOrderService
     {
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
             var order = await _unitOfWork.Orders.GetOrderByIdAsync(orderId);
             if (order == null)
             {
                 _logger.LogWarning("Order not found with ID: {OrderId}", orderId);
                 return null;
             }
-            await _unitOfWork.CompleteAsync();
             return order;
-
         }
         catch (Exception ex)
         {
-            await _unitOfWork.RollbackAsync();
             _logger.LogError(ex, "Error retrieving order by ID.");
             throw;
         }
@@ -273,7 +263,6 @@ public class OrderService : IOrderService
     {
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
             var orders = await _unitOfWork.Orders.GetOrdersByUserIdAsync(userId);
             if (orders == null || !orders.Any())
             {
@@ -296,12 +285,10 @@ public class OrderService : IOrderService
                     }
                 }
             }
-            await _unitOfWork.CompleteAsync();
             return orders;
         }
         catch (Exception ex)
         {
-            await _unitOfWork.RollbackAsync();
             _logger.LogError(ex, "Error retrieving orders by user ID.");
             throw;
         }
@@ -310,7 +297,6 @@ public class OrderService : IOrderService
     {
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
             var order = await _unitOfWork.Orders.GetOrderByIdAsync(orderId);
             if (order == null)
             {
@@ -319,6 +305,7 @@ public class OrderService : IOrderService
             }
 
             // Only restock if status is being changed to Cancelled and it wasn't already Cancelled
+            await _unitOfWork.BeginTransactionAsync();
             if (status == "Cancelled" && order.Status != "Cancelled")
             {
                 if (order.OrderItems != null)
@@ -336,7 +323,12 @@ public class OrderService : IOrderService
             }
 
             order.Status = status;
-            await _unitOfWork.CompleteAsync();
+            int rowsAffected = await _unitOfWork.CompleteAsync();
+            if (rowsAffected <= 0)
+            {
+                _logger.LogWarning("No rows affected when updating order status for ID: {OrderId}", orderId);
+                return false;
+            }
             return order != null;
         }
         catch (Exception ex)

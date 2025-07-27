@@ -43,9 +43,14 @@ public class ProductService : IProductService
         try
         {
             await _unitOfWork.BeginTransactionAsync();
-            var addedProduct = await _unitOfWork.Products.AddProductAsync(product);
-            await _unitOfWork.CompleteAsync();
-            return addedProduct;
+            await _unitOfWork.Products.AddProductAsync(product);
+            
+            int rowsAffected = await _unitOfWork.CompleteAsync();
+            if (rowsAffected == 0)
+            {
+                throw new Exception("No rows affected while adding product");
+            }
+            return product;
         }
         catch (Exception ex)
         {
@@ -58,9 +63,13 @@ public class ProductService : IProductService
         try
         {
             await _unitOfWork.BeginTransactionAsync();
-            var updatedProduct = await _unitOfWork.Products.UpdateProductAsync(product);
-            await _unitOfWork.CompleteAsync();
-            return updatedProduct;
+            await _unitOfWork.Products.UpdateProductAsync(product);
+            int rowsAffected = await _unitOfWork.CompleteAsync();
+            if (rowsAffected == 0)
+            {
+                throw new Exception("No rows affected while updating product");
+            }
+            return product;
 
         }
         catch (Exception ex)
@@ -97,20 +106,18 @@ public class ProductService : IProductService
     {
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
             var productExists = await _unitOfWork.Products.ProductExistsAsync(id);
             if (!productExists)
             {
-                await _unitOfWork.RollbackAsync();
                 return false;
             }
-            var deleted = await _unitOfWork.Products.DeleteProductAsync(id);
-            if (!deleted)
+            await _unitOfWork.BeginTransactionAsync();
+            await _unitOfWork.Products.DeleteProductAsync(id);
+            int rowsAffected = await _unitOfWork.CompleteAsync();
+            if (rowsAffected == 0)
             {
-                await _unitOfWork.RollbackAsync();
-                return false;
+                throw new Exception("No rows affected while deleting product");
             }
-            await _unitOfWork.CompleteAsync();
             return true;
 
         }
@@ -143,6 +150,7 @@ public class ProductService : IProductService
                 if (temp.Length > 2)
                 {
                     var side = temp[1];
+                    side = side.Replace(" ", "");
                     char v = temp[2].ToString()[1];
                     var size = int.Parse(v.ToString());
                     var pSide = Enum.TryParse(side, out ProductSide parsedSide);

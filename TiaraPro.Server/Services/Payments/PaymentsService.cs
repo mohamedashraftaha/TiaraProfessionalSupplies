@@ -48,21 +48,18 @@ public class PaymentsService : IPaymentsService
     {
         try
         {
-            await _unitOfWork.BeginTransactionAsync();
             var payment = await _unitOfWork.Payments.GetPaymentByIdAsync(paymentId);
             if (payment == null)
             {
                 _logger.LogWarning("Payment not found with ID: {PaymentId}", paymentId);
                 return null;
             }
-            await _unitOfWork.CompleteAsync();
             return payment;
         }
         catch (Exception ex)
         {
 
             _logger.LogError(ex, "Error retrieving payment by ID.");
-            // Log the exception
             Console.WriteLine(ex.Message);
             return null;
         }
@@ -75,22 +72,10 @@ public class PaymentsService : IPaymentsService
     {
         try
         {
-
             await _unitOfWork.BeginTransactionAsync();
-            var payment = await _unitOfWork.Payments.GetPaymentsByTransactionIdAsync(paymentId);
-            if (payment == null)
-            {
-                _logger.LogWarning("Payment not found with ID: {PaymentId}", paymentId);
-                return false;
-            }
-            payment.PaymentStatus = status;
-            var result = await _unitOfWork.Payments.UpdatePaymentStatusAsync(paymentId, status);
-            if (result)
-            {
-                await _unitOfWork.CompleteAsync();
-            }
-
-            return result;
+            await _unitOfWork.Payments.UpdatePaymentStatusAsync(paymentId, status);
+            int result =  await _unitOfWork.CompleteAsync();
+            return result > 0;
         }
         catch (Exception ex)
         {

@@ -72,7 +72,12 @@ public class UserService : IUserService
             };
             await _unitOfWork.BeginTransactionAsync();
             await _unitOfWork.Users.AddAsync(newUser);
-            await _unitOfWork.CompleteAsync();
+            int rowsAffected = await _unitOfWork.CompleteAsync();
+            if (rowsAffected == 0)
+            {
+                await _unitOfWork.RollbackAsync();
+                return false;
+            }
             return true;
         }
         catch (Exception ex)
@@ -106,7 +111,12 @@ public class UserService : IUserService
 
             await _unitOfWork.BeginTransactionAsync();
             await _unitOfWork.Users.Update(existingUser);
-            await _unitOfWork.CompleteAsync();
+            int rowsAffected = await _unitOfWork.CompleteAsync();
+            if (rowsAffected == 0)
+            {
+                await _unitOfWork.RollbackAsync();
+                return false;
+            }
             return true;
 
         }

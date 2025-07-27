@@ -28,6 +28,36 @@ const showStatusConfirmModal = ref(false)
 const showPaymobNoteModal = ref(false)
 const statusToUpdate = ref('')
 
+const sortColumn = ref('createdAt')
+const sortDirection = ref('desc')
+
+const setSort = (column) => {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortColumn.value = column
+    sortDirection.value = 'asc'
+  }
+}
+
+const sortedOrders = computed(() => {
+  const sorted = [...filteredOrders.value]
+  sorted.sort((a, b) => {
+    let valA = a[sortColumn.value]
+    let valB = b[sortColumn.value]
+    if (valA === undefined || valA === null) valA = ''
+    if (valB === undefined || valB === null) valB = ''
+    if (sortColumn.value.toLowerCase().includes('date') || sortColumn.value.toLowerCase().includes('at')) {
+      valA = new Date(valA)
+      valB = new Date(valB)
+    }
+    if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1
+    if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1
+    return 0
+  })
+  return sorted
+})
+
 // Filter orders based on search and status
 const filteredOrders = computed(() => {
   return orders.value.filter(order => {
@@ -119,11 +149,21 @@ const viewOrderDetails = async (order) => {
     const response = await api.get(`/api/order/${order.id}`)
     if (response.status === 200) {
       const detailedOrder = response.data
-      var userResponse = await api.get(`/api/user/${detailedOrder.user_id}`)
-      if (userResponse.status === 200) {
-        detailedOrder.user = userResponse.data
+      debugger;
+      if (detailedOrder.user_id !== 0) {
+        var userResponse = await api.get(`/api/user/${detailedOrder.user_id}`)
+        if (userResponse.status === 200) {
+          detailedOrder.user = userResponse.data
+        } else {
+          console.error('Failed to fetch user details')
+        }
       } else {
-        console.error('Failed to fetch user details')
+        detailedOrder.user = {
+          first_name: `(Guest User) ${detailedOrder.shipping_user_first_name}`,
+          middle_name: detailedOrder.shipping_user_middle_name,
+          last_name: detailedOrder.shipping_user_last_name,
+          email: detailedOrder.shipping_email
+        }
       }
 
       currentOrder.value = {
@@ -340,24 +380,26 @@ onMounted(async () => {
           <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
               <tr>
-                <th scope="col"
-                  class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Order ID
+                <th @click="setSort('id')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Order ID <span v-if="sortColumn==='id'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
                 </th>
-                <th scope="col"
-                  class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Customer
+                <th @click="setSort('userId')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Customer <span v-if="sortColumn==='userId'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
                 </th>
-                <th scope="col"
-                  class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
-                <th scope="col"
-                  class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Total</th>
-                <th scope="col"
-                  class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                <th scope="col"
-                  class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                <th @click="setSort('createdAt')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Date <span v-if="sortColumn==='createdAt'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th @click="setSort('totalAmount')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Total <span v-if="sortColumn==='totalAmount'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th @click="setSort('status')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Status <span v-if="sortColumn==='status'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
-              <tr v-for="order in filteredOrders" :key="order.id" class="hover:bg-slate-50 transition-colors">
+              <tr v-for="order in sortedOrders" :key="order.id" class="hover:bg-slate-50 transition-colors">
                 <td class="px-6 py-4 whitespace-nowrap font-medium text-slate-800">#{{ order.id }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">{{ order.userId }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-slate-600">{{ formatDate(order.createdAt) }}</td>

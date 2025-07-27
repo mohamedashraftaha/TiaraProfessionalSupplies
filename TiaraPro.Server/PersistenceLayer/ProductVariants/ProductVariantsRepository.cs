@@ -95,7 +95,6 @@ public class ProductVariantsRepository : IProductVariantsRepository
         {
             if (productVariant == null) return null;
             _context.ProductVariants.Update(productVariant);
-            await _context.SaveChangesAsync();
             return productVariant;
         }
         catch (Exception ex)

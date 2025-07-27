@@ -71,21 +71,25 @@ public class PaymentsRepository : IPaymentsRepository
 
         }
     }
-    public async Task<bool> UpdatePaymentStatusAsync(int paymentId, string status)
+    public async Task UpdatePaymentStatusAsync(int paymentId, string status)
     {
         try
         {
             var payment = await GetPaymentsByTransactionIdAsync(paymentId);
-            if (payment == null) return false;
+            if (payment == null)
+            {
+                var ex = new Exception($"Payment with ID {paymentId} not found.");
+                _logger.LogError(ex, "Payment not found for status update");
+                throw ex;
+            }
             payment.PaymentStatus = status;
             _context.Payments.Update(payment);
-            return true;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating payment status");
             Console.WriteLine(ex.Message);
-            return false;
+            throw;
         }
     }
 

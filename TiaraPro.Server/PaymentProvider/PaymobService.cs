@@ -20,6 +20,18 @@ public class PaymobService : IPaymobService
     }
     public async Task<PaymobIntentionResponse> CreateIntentionAsync(PaymobIntentionRequest request)
     {
+
+        try
+        {
+            if (request.PaymentMethods.Count > 2) {
+                request.PaymentMethods[2] = int.TryParse(_paymobOptions.IntegrationId, out var accId) ? accId : request.PaymentMethods[2];
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the exception
+            Console.WriteLine($"Error creating intention: {ex.Message}");
+        }
         var json = JsonConvert.SerializeObject(request, new JsonSerializerSettings
         {
             ContractResolver = new CamelCasePropertyNamesContractResolver(),

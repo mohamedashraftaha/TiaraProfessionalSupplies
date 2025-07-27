@@ -103,20 +103,26 @@
           <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Title</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Location
+                <th @click="setSort('title')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Title <span v-if="sortColumn==='title'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Speakers
+                <th @click="setSort('date')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Date <span v-if="sortColumn==='date'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Capacity
+                <th @click="setSort('location')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Location <span v-if="sortColumn==='location'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions
+                <th @click="setSort('speakers')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Speakers <span v-if="sortColumn==='speakers'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
                 </th>
+                <th @click="setSort('capacity')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Capacity <span v-if="sortColumn==='capacity'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
-              <tr v-for="event in events" :key="event.id" class="hover:bg-slate-50">
+              <tr v-for="event in sortedEvents" :key="event.id" class="hover:bg-slate-50">
                 <td class="px-6 py-4 font-bold text-slate-800">{{ event.title }}</td>
                 <td class="px-6 py-4">{{ formatDate(event.date) }}</td>
                 <td class="px-6 py-4">{{ event.location }}</td>
@@ -258,7 +264,7 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api from '../../utils/Api.ts'
 
 interface EventDTO {
@@ -419,6 +425,36 @@ const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
   return d.toLocaleString();
 };
+
+const sortColumn = ref('date')
+const sortDirection = ref('desc')
+
+const setSort = (column) => {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortColumn.value = column
+    sortDirection.value = 'asc'
+  }
+}
+
+const sortedEvents = computed(() => {
+  const sorted = [...events.value]
+  sorted.sort((a, b) => {
+    let valA = a[sortColumn.value]
+    let valB = b[sortColumn.value]
+    if (valA === undefined || valA === null) valA = ''
+    if (valB === undefined || valB === null) valB = ''
+    if (sortColumn.value.toLowerCase().includes('date') || sortColumn.value.toLowerCase().includes('at')) {
+      valA = new Date(valA)
+      valB = new Date(valB)
+    }
+    if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1
+    if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1
+    return 0
+  })
+  return sorted
+})
 
 onMounted(async () => { await fetchEvents(); });
 </script>

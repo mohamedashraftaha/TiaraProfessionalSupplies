@@ -36,17 +36,14 @@ public class UserRepository : IUserRepository
     public async Task AddAsync(User user)
     {
         await _context.Users.AddAsync(user);
-        await SaveAsync();
     }
     public async Task Update(User user)
     {
         _context.Users.Update(user);
-        await SaveAsync();
     }
     public async Task Delete(User user)
     {
         _context.Users.Remove(user);
-        await SaveAsync();
     }
     public async Task SaveAsync()
     {

@@ -6,6 +6,6 @@ export default defineConfig({
   plugins: [vue()],
   server: {
     port: 3000,
-    allowedHosts: ['s78b6r5jagfc.share.zrok.io'],
+    allowedHosts: ['981c640cbab0.ngrok-free.app'],
   },
 })

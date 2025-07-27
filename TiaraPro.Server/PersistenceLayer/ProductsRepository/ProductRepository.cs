@@ -50,17 +50,15 @@ public class ProductRepository : IProductRepository
     {
         return await _context.Products.Where(p => p.CategoryId == categoryId).ToListAsync();
     }
-    public async Task<Product> AddProductAsync(Product product)
+    public async Task AddProductAsync(Product product)
     {
         if (string.IsNullOrEmpty(product.LogoUrl))
         {
             product.LogoUrl = null;
         }
         await _context.Products.AddAsync(product);
-        await _context.SaveChangesAsync();
-        return product;
     }
-    public async Task<Product> UpdateProductAsync(Product product)
+    public async Task UpdateProductAsync(Product product)
     {
 
         if (string.IsNullOrEmpty(product.LogoUrl))
@@ -68,16 +66,11 @@ public class ProductRepository : IProductRepository
             product.LogoUrl = null;
         }
         _context.Products.Update(product);
-        await _context.SaveChangesAsync();
-        return product;
     }
-    public async Task<bool> DeleteProductAsync(int id)
+    public async Task DeleteProductAsync(int id)
     {
         var product = await GetProductByIdAsync(id);
-        if (product == null) return false;
         _context.Products.Remove(product);
-        await _context.SaveChangesAsync();
-        return true;
     }
     public async Task<bool> ProductExistsAsync(int id)
     {

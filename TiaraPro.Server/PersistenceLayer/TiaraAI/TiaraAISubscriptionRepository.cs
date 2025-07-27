@@ -29,14 +29,12 @@ namespace TiaraPro.Server.PersistenceLayer.TiaraAI
         public async Task CreateAsync(TiaraAISubscription subscription)
         {
             await _context.TiaraAISubscriptions.AddAsync(subscription);
-            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(TiaraAISubscription subscription)
         {
             subscription.UpdatedAt = DateTimeOffset.UtcNow;
             _context.TiaraAISubscriptions.Update(subscription);
-            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
@@ -45,7 +43,6 @@ namespace TiaraPro.Server.PersistenceLayer.TiaraAI
             if (subscription != null)
             {
                 _context.TiaraAISubscriptions.Remove(subscription);
-                await _context.SaveChangesAsync();
             }
         }
     }

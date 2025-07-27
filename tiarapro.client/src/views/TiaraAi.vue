@@ -22,12 +22,17 @@
             </div>
 
             <h1 class="text-5xl font-bold mb-6 text-white">
-              Transform Your Practice with AI
+              Unlock the Future of Dental Practice
             </h1>
-            <p class="text-xl text-white/80 mb-12">
+            <h1 class="text-1xl font-bold mb-6 text-white">
+              Precision. Efficiency. Innovation.
+              <br> Powered by AI.
+            </h1>
+
+            <!-- <p class="text-xl text-white/80 mb-12">
               Harness the power of artificial intelligence to enhance diagnostic accuracy, streamline workflows, and
               improve patient outcomes
-            </p>
+            </p> -->
             <div class="flex justify-center gap-6">
               <!-- Subscribe Now Button -->
               <button @click="scrollToSubscription"
@@ -42,7 +47,7 @@
       <!-- Features Grid -->
       <section class="py-24">
         <div class="container mx-auto px-4">
-          <h2 class="text-3xl font-bold text-center mb-16">How Tiara AI Transforms Dental Practices</h2>
+          <!-- <h2 class="text-3xl font-bold text-center mb-16">How Tiara AI Transforms Dental Practices</h2> -->
           <div class="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-5xl mx-auto">
             <div v-for="feature in features" :key="feature.title"
               class="bg-white p-8 rounded-lg border border-gray-200 hover:border-[#1e3a8a] transition-colors">
@@ -57,7 +62,7 @@
       </section>
 
       <!-- Technology Partnership Section -->
-      <section class="py-16 bg-gray-50">
+      <!-- <section class="py-16 bg-gray-50">
         <div class="container mx-auto px-4">
           <div class="max-w-4xl mx-auto">
             <h2 class="text-3xl font-bold text-center mb-8">Powered by Advanced Technology</h2>
@@ -88,15 +93,15 @@
             </div>
           </div>
         </div>
-      </section>
+      </section> -->
 
       <!-- Subscription Section -->
-      <section id="subscribe" class="py-24 bg-gradient-to-br from-gray-50 to-blue-50">
+      <section id="subscribe" class="py-16 bg-gradient-to-br from-gray-50 to-blue-50">
         <div class="container mx-auto px-4">
           <div class="max-w-4xl mx-auto text-center mb-16">
-            <h2 class="text-4xl font-bold mb-6 text-gray-900">Choose Your TiaraAI Plan</h2>
+            <h2 class="text-4xl font-bold mb-6 text-gray-900">Choose Your Plan</h2>
             <p class="text-xl text-gray-600 max-w-2xl mx-auto">
-              Start leveraging the power of AI today with our flexible subscription plans designed for dental practices
+              Start leveraging the power of AI today with flexible subscription plans designed for dental practices
               of all sizes
             </p>
           </div>
@@ -303,19 +308,19 @@ const router = useRouter();
 
 const features = [
   {
-    title: 'Diagnostic Assistance',
-    description: 'Our AI helps identify abnormalities in dental images with higher accuracy',
-    icon: 'fas fa-brain'
+    title: 'Enhanced Diagnostics',
+    description: 'Improve diagnostic accuracy and identify subtle issues with AI-assisted image analysis',
+    icon: 'fas fa-microscope'
   },
   {
-    title: 'Treatment Planning',
-    description: 'Generate personalized treatment plans based on patient history and best practices',
-    icon: 'fas fa-clipboard-list'
+    title: 'Personalized Treatment Planning',
+    description: 'Leverage data-driven insights to create customized and effective treatment plans for every patient.',
+    icon: 'fas fa-notes-medical'
   },
   {
-    title: 'Risk Assessment',
-    description: 'Predict potential oral health issues before they develop, allowing for preventive intervention',
-    icon: 'fas fa-chart-line'
+    title: 'Patient Engagement & Education',
+    description: 'Improve patient understanding and communication with interactive AI-powered tools.',
+    icon: 'fas fa-chalkboard-teacher'
   }
 ];
 

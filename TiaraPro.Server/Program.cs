@@ -113,7 +113,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", builder =>
     {
-        builder.WithOrigins("http://localhost:3000", "https://tiarapro.com", "https://s78b6r5jagfc.share.zrok.io")
+        builder.WithOrigins("http://localhost:3000", "https://tiarapro.com", "https://981c640cbab0.ngrok-free.app")
                .AllowAnyMethod()
                .AllowAnyHeader();
     });

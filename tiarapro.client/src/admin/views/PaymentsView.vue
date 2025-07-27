@@ -10,6 +10,36 @@
   const showViewModal = ref(false)
   const currentPayment = ref(null)
 
+  const sortColumn = ref('created_at')
+  const sortDirection = ref('desc')
+
+  const setSort = (column) => {
+    if (sortColumn.value === column) {
+      sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+    } else {
+      sortColumn.value = column
+      sortDirection.value = 'asc'
+    }
+  }
+
+  const sortedPayments = computed(() => {
+    const sorted = [...filteredPayments.value]
+    sorted.sort((a, b) => {
+      let valA = a[sortColumn.value]
+      let valB = b[sortColumn.value]
+      if (valA === undefined || valA === null) valA = ''
+      if (valB === undefined || valB === null) valB = ''
+      if (sortColumn.value.toLowerCase().includes('date') || sortColumn.value.toLowerCase().includes('at')) {
+        valA = new Date(valA)
+        valB = new Date(valB)
+      }
+      if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1
+      if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1
+      return 0
+    })
+    return sorted
+  })
+
   // Status options for filtering
   const statusOptions = [
     { value: 'all', label: 'All Statuses' },
@@ -222,17 +252,29 @@
           <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
               <tr>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Transaction ID</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Order</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Amount</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Payment Method</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Date</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</th>
-                <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
+                <th @click="setSort('transaction_id')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Transaction ID <span v-if="sortColumn==='transaction_id'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th @click="setSort('order_id')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Order <span v-if="sortColumn==='order_id'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th @click="setSort('amount')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Amount <span v-if="sortColumn==='amount'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th @click="setSort('payment_method')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Payment Method <span v-if="sortColumn==='payment_method'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th @click="setSort('created_at')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Date <span v-if="sortColumn==='created_at'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th @click="setSort('status')" class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider cursor-pointer">
+                  Status <span v-if="sortColumn==='status'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-slate-200">
-              <tr v-for="payment in filteredPayments" :key="payment.id" class="hover:bg-slate-50 transition-colors">
+              <tr v-for="payment in sortedPayments" :key="payment.id" class="hover:bg-slate-50 transition-colors">
                 <td class="px-6 py-4 whitespace-nowrap font-medium text-slate-800">{{ payment.transaction_id || '-' }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <a href="#" class="text-primary hover:underline">#{{ payment.order_id }}</a>

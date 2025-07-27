@@ -4,7 +4,7 @@ namespace TiaraPro.Server.PersistenceLayer.OrdersRepository
 {
     public interface IOrderRepository
     {
-        Task<int> CreateOrderAsync(Order order);
+        Task CreateOrderAsync(Order order);
         Task<Order?> GetOrderByIdAsync(int orderId);
 
         Task<List<Order>> GetAllOrdersAsync();

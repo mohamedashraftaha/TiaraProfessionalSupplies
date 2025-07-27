@@ -49,13 +49,11 @@ namespace TiaraPro.Server.PersistenceLayer.UserRepositories
         public async Task CreateAsync(UserSubscription userSubscription)
         {
             await _context.UserSubscriptions.AddAsync(userSubscription);
-            await _context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync(UserSubscription userSubscription)
         {
             _context.UserSubscriptions.Update(userSubscription);
-            await _context.SaveChangesAsync();
         }
 
         public async Task DeactivateUserSubscriptionsAsync(int userId)
@@ -68,8 +66,6 @@ namespace TiaraPro.Server.PersistenceLayer.UserRepositories
             {
                 subscription.IsActive = false;
             }
-
-            await _context.SaveChangesAsync();
         }
     }
 }

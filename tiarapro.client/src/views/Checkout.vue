@@ -187,7 +187,7 @@ const CreatePaymentRequest = async (orderId: number | string) => {
     const response = await api.post('/api/payment/create-intention', {
       amount: total.value * 100, // total amount to be paid
       currency: 'EGP',
-      payment_methods: [12, 'card', 5021053], // static payment methods
+      payment_methods: [12, 'card', 5193419], // static payment methods Test: 5021053
       items: [
         ...cartItems.value.map(item => ({
           name: (item.name != null && item.name.length > 50) ? item.name.substring(0, 50) : item.name,

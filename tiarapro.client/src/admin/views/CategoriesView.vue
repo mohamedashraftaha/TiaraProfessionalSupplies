@@ -11,6 +11,41 @@ const currentCategory = ref(null)
 const form = ref({ name: '', parent_category_id: null, logo_url: '', is_active: true })
 const deleteTarget = ref(null)
 
+const sortColumn = ref('name')
+const sortDirection = ref('asc')
+
+const setSort = (column) => {
+  if (sortColumn.value === column) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
+  } else {
+    sortColumn.value = column
+    sortDirection.value = 'asc'
+  }
+}
+
+const sortedCategories = computed(() => {
+  const sorted = [...categories.value]
+  sorted.sort((a, b) => {
+    let valA, valB
+    if (sortColumn.value === 'parent') {
+      valA = parentName(a)
+      valB = parentName(b)
+    } else if (sortColumn.value === 'is_active') {
+      valA = a.is_active ? 1 : 0
+      valB = b.is_active ? 1 : 0
+    } else {
+      valA = a[sortColumn.value]
+      valB = b[sortColumn.value]
+    }
+    if (valA === undefined || valA === null) valA = ''
+    if (valB === undefined || valB === null) valB = ''
+    if (valA < valB) return sortDirection.value === 'asc' ? -1 : 1
+    if (valA > valB) return sortDirection.value === 'asc' ? 1 : -1
+    return 0
+  })
+  return sorted
+})
+
 const fetchCategories = async () => {
   debugger;
   loading.value = true
@@ -77,14 +112,20 @@ const parentName = (cat) => {
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Parent</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Active</th>
+            <th @click="setSort('name')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+              Name <span v-if="sortColumn==='name'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+            </th>
+            <th @click="setSort('parent')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+              Parent <span v-if="sortColumn==='parent'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+            </th>
+            <th @click="setSort('is_active')" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">
+              Active <span v-if="sortColumn==='is_active'">{{ sortDirection==='asc' ? '▲' : '▼' }}</span>
+            </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <tr v-for="cat in categories" :key="cat.id">
+          <tr v-for="cat in sortedCategories" :key="cat.id">
             <td class="px-6 py-4 whitespace-nowrap">{{ cat.name }}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{ parentName(cat) }}</td>
             <td class="px-6 py-4 whitespace-nowrap">

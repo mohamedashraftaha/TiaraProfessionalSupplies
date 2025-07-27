@@ -61,7 +61,6 @@ namespace TiaraPro.Server.Services.TiaraAI
         {
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
 
                 var subscription = await GetSubscriptionByIdAsync(subscriptionId);
                 if (subscription == null)
@@ -79,6 +78,7 @@ namespace TiaraPro.Server.Services.TiaraAI
                         return false; // User already has an active subscription
                     }
                 }
+                await _unitOfWork.BeginTransactionAsync();
 
                 var userSubscription = new UserSubscription
                 {
@@ -91,7 +91,12 @@ namespace TiaraPro.Server.Services.TiaraAI
                 };
 
                 await _unitOfWork.UserSubscriptions.CreateAsync(userSubscription);
-                await _unitOfWork.CompleteAsync();
+                int rowsAffected =  await _unitOfWork.CompleteAsync();
+                if (rowsAffected <= 0)
+                {
+                    _logger.LogWarning("Failed to create user subscription for user: {UserId}", userId);
+                    return false;
+                }
                 return true;
             }
             catch (Exception ex)
@@ -133,8 +138,14 @@ namespace TiaraPro.Server.Services.TiaraAI
                 }
                 // Update the segmentations used count
                 userSubscription.SegmentationsUsed++;
+                await _unitOfWork.BeginTransactionAsync();
                 await _unitOfWork.UserSubscriptions.UpdateAsync(userSubscription);
-                await _unitOfWork.CompleteAsync();
+                int rowsAffected = await _unitOfWork.CompleteAsync();
+                if (rowsAffected <= 0)
+                {
+                    _logger.LogWarning("Failed to update user subscription usage for email: {Email}", email);
+                    return false;
+                }
                 return true;
             }
             catch (Exception ex)
@@ -148,7 +159,6 @@ namespace TiaraPro.Server.Services.TiaraAI
         {
             try
             {
-                await _unitOfWork.BeginTransactionAsync();
 
                 // Get the user subscription for this order
                 var userSubscription = await _unitOfWork.UserSubscriptions.GetByOrderIdAsync(orderId);
@@ -157,6 +167,7 @@ namespace TiaraPro.Server.Services.TiaraAI
                     _logger.LogWarning("User subscription not found for order: {OrderId}", orderId);
                     return false;
                 }
+                await _unitOfWork.BeginTransactionAsync();
 
                 // Deactivate any existing active subscriptions for this user
                 await _unitOfWork.UserSubscriptions.DeactivateUserSubscriptionsAsync(userId);
@@ -173,7 +184,12 @@ namespace TiaraPro.Server.Services.TiaraAI
                     await _unitOfWork.Users.Update(user);
                 }
 
-                await _unitOfWork.CompleteAsync();
+                int rowsAffected =await _unitOfWork.CompleteAsync();
+                if (rowsAffected <= 0)
+                {
+                    _logger.LogWarning("Failed to activate user subscription for user: {UserId}", userId);
+                    return false;
+                }
                 return true;
             }
             catch (Exception ex)

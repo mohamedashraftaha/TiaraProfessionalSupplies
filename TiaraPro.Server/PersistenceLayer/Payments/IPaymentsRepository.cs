@@ -10,7 +10,7 @@ public interface IPaymentsRepository
     Task<Payment?> GetPaymentsByTransactionIdAsync(int transactionId);
 
     Task<List<Payment?>?> GetPayments();
-    Task<bool> UpdatePaymentStatusAsync(int paymentId, string status);
+    Task UpdatePaymentStatusAsync(int paymentId, string status);
     Task<bool> DeletePaymentAsync(int paymentId);
     Task<bool> UpdatePaymentAsync(Payment payment);
 

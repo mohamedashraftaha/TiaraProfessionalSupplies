@@ -19,9 +19,17 @@ const { totalItems } = storeToRefs(cartStore);
 console.log("TOTAL ITEMS", totalItems.value)
 // Tab navigation for main features
 const navTabs = [
-  { name: 'Tiara Dental Training', route: '/training' },
+  {
+    name: 'Tiara Dental Training',
+    route: '/training',
+    logo: 'https://tiaraprofessionalsupplies.s3.eu-central-1.amazonaws.com/Tiara-DT-logo-original.svg'
+  },
   // { name: 'Events', route: '/events' },
-  { name: 'Tiara AI', route: '/ai' }
+  {
+    name: 'Tiara AI',
+    route: '/ai',
+    logo: 'https://tiaraprofessionalsupplies.s3.eu-central-1.amazonaws.com/Tiara-AI-logo-original.svg'
+  }
 ]
 // Notification logic
 const userId = localStorage.getItem('userId')
@@ -68,13 +76,19 @@ onMounted(() => {
           <div class="flex justify-center space-x-8">
             <div class="flex border-b border-gray-200">
               <router-link v-for="tab in navTabs" :key="tab.route" :to="tab.route"
-                class="px-6 py-2 text-lg font-medium focus:outline-none transition-colors border-b-2"
+                class="px-6 py-2 text-lg font-medium focus:outline-none transition-colors border-b-2 flex items-center justify-center"
                 :class="route.path === tab.route ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-blue-600'">
-                {{ tab.name }}
+                <template v-if="tab.logo">
+                  <img :src="tab.logo" :alt="tab.name" class="h-16 w-full object-contain" />
+                </template>
+                <template v-else>
+                  {{ tab.name }}
+                </template>
               </router-link>
             </div>
           </div>
         </div>
+
 
         <div class="flex items-center space-x-6">
           <!-- Notifications Button -->
